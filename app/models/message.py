@@ -11,7 +11,7 @@ class Message(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     client_name = Column(String(50), nullable=False)
-    phone_number = Column(String(15), nullable=False)
+    phone_number = Column(String(15), nullable=False, unique=True, index=True)
     role = Column(Enum(Role), nullable=False) #bot/user
     message_content = Column(Text, nullable=False)
     context = Column(Enum(Context), nullable=False)
