@@ -1,8 +1,8 @@
 """create messages table
 
-Revision ID: 54aaf8f3dd2f
+Revision ID: 13eb8344d8a1
 Revises: 
-Create Date: 2026-04-16 11:07:18.211304
+Create Date: 2026-04-20 11:50:21.081304
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '54aaf8f3dd2f'
+revision: str = '13eb8344d8a1'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -25,8 +25,9 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('client_name', sa.String(length=50), nullable=False),
     sa.Column('phone_number', sa.String(length=15), nullable=False),
-    sa.Column('role', sa.String(length=10), nullable=False),
+    sa.Column('role', sa.Enum('USER', 'BOT', name='role'), nullable=False),
     sa.Column('message_content', sa.Text(), nullable=False),
+    sa.Column('context', sa.Enum('WAITING_MESSAGE_1', 'WAITING_MESSAGE_2', 'WAITING_MESSAGE_3', 'WAITING_MESSAGE_4', 'WAITING_MESSAGE_5', name='context'), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
