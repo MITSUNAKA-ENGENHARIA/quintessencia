@@ -6,3 +6,11 @@ class Context(enum.Enum):
      WAITING_MESSAGE_3 = "WAITING_MESSAGE_3"
      WAITING_MESSAGE_4 = "WAITING_MESSAGE_4"
      WAITING_MESSAGE_5 = "WAITING_MESSAGE_5"
+
+CONTEXTS = [
+     Context.WAITING_MESSAGE_1,
+     Context.WAITING_MESSAGE_2,
+     Context.WAITING_MESSAGE_3,
+     Context.WAITING_MESSAGE_4,
+     Context.WAITING_MESSAGE_5,
+     ]

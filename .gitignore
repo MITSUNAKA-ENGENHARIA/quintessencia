@@ -7,3 +7,4 @@ wheels/
 *.db
 .venv
 quintessencia
+.env
