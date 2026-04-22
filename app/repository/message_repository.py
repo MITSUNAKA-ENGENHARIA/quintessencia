@@ -1,26 +1,74 @@
-from sqlalchemy.orm import Session
 from app.models.message import Message
 from app.models.role import Role
-from datetime import datetime
+from app.models.context import Context
 
 class MessageRepository:
-     def __init__(self, db: Session):
-          self.db = db
-     
-     def create(self,
-                client_name: str,
-                phone_number: str,
-                role: Role,
-                message_content: str,
-                context: str,
-                created_at: datetime):
-          db_message = Message(client_name=client_name,
-                               phone_number=phone_number,
-                               role=role,
-                               message_content=message_content,
-                               context=context,
-                               created_at=created_at)
-          self.db.add(db_message)
-          self.db.commit()
-          self.db.refresh(db_message)
-          return db_message
+    def __init__(self, db_session):
+        self.db = db_session
+        
+    def save_message(
+        self,
+        client_name: str,
+        phone_number: str,
+        message_content: str,
+        role: Role,
+        context: Context
+    ):
+        message = Message(
+            client_name = client_name,
+            phone_number = phone_number,
+            message_content = message_content,
+            role = role,
+            context = context
+        )
+        
+        self.db.add(message)
+        self.db.commit()
+        self.db.refresh(message)
+
+        return message
+    
+    def get_current_context(self, phone_number: str):
+        message = (
+            self.db.query(Message)
+            .filter(Message.phone_number == phone_number)
+            .order_by(Message.created_at.desc())
+            .first()
+        )
+        
+        return message.context if message else None
+    
+    def update_context(self, phone_number: str, new_context: Context):
+        last_message = (
+            self.db.query(Message)
+            .filter(Message.phone_number == phone_number)
+            .order_by(Message.created_at.desc())
+            .first()
+        )
+        
+        if last_message:
+            last_message.context = new_context
+            self.db.commit()
+            self.db.refresh(last_message)
+            
+        return last_message
+    
+    def get_n_messages(self, phone_number: str, limit: int = 10):
+        n_messages = (
+            self.db.query(Message)
+            .filter(Message.phone_number == phone_number)
+            .order_by(Message.created_at.asc())
+            .limit(limit)
+            .all()
+        )
+        
+        return n_messages
+    
+    def phone_exists(self, phone_number: str):
+        return(
+            self.db.query(Message.id)
+            .filter(Message.phone_number == phone_number)
+            .first() is not None
+        )
+    
+    
