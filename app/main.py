@@ -4,6 +4,7 @@ from app.repository.message_repository import MessageRepository
 from app.database.connection import SessionLocal
 from app.models.role import Role
 from app.models.context import Context, CONTEXTS
+from app.shared.script import handle_contexts
 
 import time
 import threading
@@ -24,7 +25,6 @@ def on_message(client: NewClient, event: MessageEv):
     sender = event.Info.MessageSource.Sender
     name = event.Info.Pushname
 
-    print(f"sender ({sender.User} | {name}): {text}")
 
     if msg_repository.phone_exists(sender.User):
         idx = CONTEXTS.index(msg_repository.get_current_context(sender.User))
@@ -34,8 +34,12 @@ def on_message(client: NewClient, event: MessageEv):
 
     if text == "ping":
         client.send_message(sender, "pong")
-    elif text == "hello":
-        client.reply_message("Hello! 👋 How can I help you?", event)
+
+    reply = handle_contexts(msg_repository.get_current_context(sender.User))
+    client.send_message(sender, reply)
+    
+    print(f"\nsender ({sender.User} | {name}): {text}")
+    print(f"bot: {reply}\n")
 
 def main():
     t = threading.Thread(target=client.connect, daemon=True)
