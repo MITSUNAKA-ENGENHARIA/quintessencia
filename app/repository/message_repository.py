@@ -28,7 +28,7 @@ class MessageRepository:
 
         return message
     
-    def get_current_context(self, phone_number: str):
+    def get_current_context(self, phone_number: str) -> Message:
         message = (
             self.db.query(Message)
             .filter(Message.phone_number == phone_number)
@@ -37,6 +37,16 @@ class MessageRepository:
         )
         
         return message.context if message else None
+    
+    def get_by_context(self, phone_number: str, context: Context) -> Message:
+        message = (
+            self.db.query(Message)
+            .filter(Message.phone_number == phone_number, Message.context == context)
+            .order_by(Message.created_at.desc())
+            .first()
+        )
+
+        return message
     
     def update_context(self, phone_number: str, new_context: Context):
         last_message = (
@@ -63,6 +73,16 @@ class MessageRepository:
         )
         
         return n_messages
+    
+    def get_last_message(self, phone_number: str) -> Message:
+        message = (
+            self.db.query(Message)
+            .filter(Message.phone_number == phone_number)
+            .order_by(Message.created_at.desc())
+            .limit(1)
+            .all()
+        )
+        return message[0]
     
     def phone_exists(self, phone_number: str):
         return(

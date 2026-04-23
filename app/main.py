@@ -5,6 +5,7 @@ from app.database.connection import SessionLocal
 from app.models.role import Role
 from app.models.context import Context, CONTEXTS
 from app.shared.script import handle_contexts
+from tabulate import tabulate
 
 import time
 import threading
@@ -28,18 +29,19 @@ def on_message(client: NewClient, event: MessageEv):
 
     if msg_repository.phone_exists(sender.User):
         idx = CONTEXTS.index(msg_repository.get_current_context(sender.User))
-        msg_repository.update_context(sender.User, CONTEXTS[(idx+1)%len(CONTEXTS)])
+        msg_repository.save_message(name, sender.User, text, Role.USER, CONTEXTS[(idx+1)%len(CONTEXTS)])
     else:
         msg_repository.save_message(name, sender.User, text, Role.USER, Context.WAITING_MESSAGE_1)
 
     if text == "ping":
         client.send_message(sender, "pong")
 
-    reply = handle_contexts(msg_repository.get_current_context(sender.User))
+    reply = handle_contexts(msg_repository.get_current_context(sender.User), sender.User, msg_repository)
     client.send_message(sender, reply)
-    
-    print(f"\nsender ({sender.User} | {name}): {text}")
-    print(f"bot: {reply}\n")
+
+    table_headers = [f"sender ({sender.User} | {name})", "bot"]
+    table_contents = [[text, reply]]
+    print(tabulate(table_contents, headers=table_headers, tablefmt="outline"))
 
 def main():
     t = threading.Thread(target=client.connect, daemon=True)
