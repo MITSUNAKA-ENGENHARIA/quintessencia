@@ -38,8 +38,10 @@ def on_message(client: NewClient, event: MessageEv):
     reply = handle_contexts(msg_repository.get_current_context(sender.User))
     client.send_message(sender, reply)
     
-    print(f"\nsender ({sender.User} | {name}): {text}")
-    print(f"bot: {reply}\n")
+    print(40*"=")
+    print(f"sender ({sender.User} | {name}): {text}")
+    print(f"bot: {reply}")
+    print(40*"=")
 
 def main():
     t = threading.Thread(target=client.connect, daemon=True)
